@@ -4,7 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js"
 import Product from "./model/productSchema.js";
-import upload from "./config/upload.js";
+import upload from "./middleware/upload.js";
 
 dotenv.config();
 
@@ -19,8 +19,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 
-// multer config
-// const storage = multer.diskStorage({
+//  const storage = multer.diskStorage({
 //   destination: (req, file, cb) => {
 //     cb(null, "uploads/");
 //   },
@@ -28,7 +27,6 @@ app.use("/uploads", express.static("uploads"));
 //     cb(null, Date.now() + "-" + file.originalname);
 //   },
 // });
-
 // const upload = multer({ storage });
 
 // test route
@@ -53,13 +51,17 @@ app.get("/product/:id", async (req, res) => {
     res.status(500).json({ message: "Failed to fetch products" });
   }
 });
-// ✅ ADD PRODUCT (POST)
-app.post("/addProduct", upload.array("images", 4), async(req, res) => {
+
+app.post("/addProduct", upload.array("images", 4), async (req, res) => {
+  try {
+
+    console.log("ROUTE HIT ✅");
+
+ 
   const { name, price, description } = req.body;
   const images = req.files; 
-  console.log(images)
-  return
-let arr = []
+
+  let arr = []
   const imageData = images.map(file => {
   arr.push(file.path.replace(/\\/g, "/"))
 });
@@ -89,8 +91,10 @@ if(!product){
       images,
     },
   });
-});
-
+   } catch (error) {
+    res.status(500).json({ message: "Failed to add products" });
+  }});
+ 
  app.delete("/deleteProduct/:id", async(req, res) => {
   try {
 
