@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js"
 import Product from "./model/productSchema.js";
+import upload from "./config/upload.js";
 
 dotenv.config();
 
@@ -19,16 +20,16 @@ app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 
 // multer config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "uploads/");
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, Date.now() + "-" + file.originalname);
+//   },
+// });
 
-const upload = multer({ storage });
+// const upload = multer({ storage });
 
 // test route
 app.get("/", (req, res) => {
@@ -56,6 +57,8 @@ app.get("/product/:id", async (req, res) => {
 app.post("/addProduct", upload.array("images", 4), async(req, res) => {
   const { name, price, description } = req.body;
   const images = req.files; 
+  console.log(images)
+  return
 let arr = []
   const imageData = images.map(file => {
   arr.push(file.path.replace(/\\/g, "/"))
