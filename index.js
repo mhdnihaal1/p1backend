@@ -1,13 +1,13 @@
+import dotenv from "dotenv";
+dotenv.config(); // MUST BE FIRST
 import express from "express";
 import multer from "multer";
 import cors from "cors";
-import dotenv from "dotenv";
-import connectDB from "./config/db.js"
+ import connectDB from "./config/db.js"
 import Product from "./model/productSchema.js";
 import upload from "./middleware/upload.js";
 
-dotenv.config();
-
+ 
 const app = express();
 const PORT = 5000;
 
@@ -17,7 +17,8 @@ connectDB();
 // middleware
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static("uploads"));
+app.use(express.urlencoded({ extended: true }));
+// app.use("/uploads", express.static("uploads"));
 
 //  const storage = multer.diskStorage({
 //   destination: (req, file, cb) => {
@@ -54,14 +55,13 @@ app.get("/product/:id", async (req, res) => {
 
 app.post("/addProduct", upload.array("images", 4), async (req, res) => {
   try {
-
     console.log("ROUTE HIT ✅");
+    console.log("FILES:", req.files);
 
  
   const { name, price, description } = req.body;
   const images = req.files; 
-
-  let arr = []
+   let arr = []
   const imageData = images.map(file => {
   arr.push(file.path.replace(/\\/g, "/"))
 });
